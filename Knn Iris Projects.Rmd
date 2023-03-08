@@ -1,0 +1,99 @@
+---
+title: "Knn Project IRIS"
+output: html_document
+date: "2023-03-05"
+---
+```{r}
+library(datasets)
+```
+```{r}
+str(iris)
+```
+```{r}
+head(iris)
+```
+#Standardize Data
+```{r}
+
+standard.iris<-scale(iris[,-5])
+var(standard.iris[,1])
+var(standard.iris[,3])
+```
+```{r}
+iris$Species
+```
+
+```{r}
+standard.iris<-cbind(standard.iris,iris[5])
+head(standard.iris)
+```
+```{r}
+library(caTools)
+split<-sample.split(standard.iris$Species,SplitRatio = 0.7)
+Train.df<-subset(standard.iris,split==TRUE)
+Test.df<-subset(standard.iris,split==FALSE)
+```
+```{r}
+library(class)
+modelknn<-knn(Train.df[,-5],Test.df[,-5],Train.df$Species,k=1)
+summary(modelknn)
+head(modelknn)
+```
+```{r}
+erorr<-mean(Test.df$Species!=modelknn)
+erorr
+
+```
+```{r}
+vec = c()
+k_vec = c()
+for(k in 1:20){
+  set.seed(123)
+  classifier.flower<-knn(Train.df[,-5],Test.df[,-5],Train.df$Species,k=k)
+  erorrs<-mean(Test.df$Species!= classifier.flower)
+  k_vec = c(k_vec,k)
+  vec = c(vec,erorrs)
+}
+```
+```{r}
+ks<-data.frame(vec,k_vec)
+ks
+```
+```{r}
+ggplot(ks,aes(k_vec,vec))+geom_point()+geom_line(color="red")
+```
+```{r}
+model.clasifier<-knn(Train.df[,-5],Test.df[,-5],Train.df$Species,k=20)
+mean(Test.df$Species!=model.clasifier)
+```
+
+
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
